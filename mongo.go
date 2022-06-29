@@ -2,8 +2,10 @@ package xk6_mongo
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
 	"log"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -78,20 +80,19 @@ func (c *Client) Find(database string, collection string, filter map[string]stri
 	return nil
 }
 
-func (c *Client) FindOne(database string, collection string, filter map[string]string) error {
-	var result bson.M
-	
-	collection := c.client.Database(database).Collection(collection)
-	filter := bson.D{filter}
+func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) error {
+	collection := c.client.Database(databaseName).Collection(collectionName)
 	opts := options.FindOne()
+	objId, err := primitive.ObjectIDFromHex(objectIdStr)
 	
-	err = collection.FindOne(context.TODO(), filter, opts).Decode(&result)
+	var result bson.M
+	err = collection.FindOne(context.TODO(), bson.M{"_id": objId}, opts).Decode(&result)
 	
 	if err != nil {
-    	    log.Fatal(err)
+    	log.Fatal(err)
 	}
 	
 	log.Printf("Found the document: %+v\n", result)
 	
-	return result
+	return nil
 }
