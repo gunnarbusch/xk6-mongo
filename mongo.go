@@ -79,15 +79,19 @@ func (c *Client) Find(database string, collection string, filter map[string]stri
 }
 
 func (c *Client) FindOne(database string, collection string, filter map[string]string) error {
-	db := c.client.Database(database)
-	col := db.Collection(collection)
 	var result bson.M
-	opts := options.FindOne().SetSort(bson.D{{"_id", 1}})
-	log.Print("filter is ", filter)
-	err := col.FindOne(context.TODO(), filter, opts).Decode(&result)
+	
+	collection := c.client.Database(database).Collection(collection)
+	filter := bson.D{filter}
+	opts := options.FindOne()
+	
+	err = collection.FindOne(context.TODO(), filter, opts).Decode(&result)
+	
 	if err != nil {
-		log.Fatal(err)
+    	    log.Fatal(err)
 	}
-	log.Printf("found document %v", result)
-	return nil
+	
+	log.Printf("Found the document: %+v\n", result)
+	
+	return result
 }
