@@ -80,21 +80,18 @@ func (c *Client) Find(database string, collection string, filter map[string]stri
 	return nil
 }
 
-func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) bson.M {
-	log.Printf("Find with object id filter: %+v\n", objectIdStr)
-
+func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) bson.Raw {
 	collection := c.client.Database(databaseName).Collection(collectionName)
 	opts := options.FindOne()
 	objId, err := primitive.ObjectIDFromHex(objectIdStr)
 	
-	var result bson.M
-	err = collection.FindOne(context.TODO(), bson.M{"_id": objId}, opts).Decode(&result)
+	bytes, err := collection.FindOne(context.TODO(), bson.M{"_id": objId}, opts).DecodeBytes()
 	
 	if err != nil {
     	log.Fatal(err)
 	}
 	
-	log.Printf("Found the document: %+v\n", result)
-	
-	return result
+	log.Printf("Response: %+v\n", bytes)
+
+	return bytes
 }
