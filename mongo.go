@@ -41,16 +41,6 @@ func (m *Mongo) XClient(ctxPtr *context.Context, connURI string) interface{} {
 	return k6common.Bind(rt, &Client{client: client}, ctxPtr)
 }
 
-func (c *Client) Insert(database string, collection string, doc map[string]string) error {
-	db := c.client.Database(database)
-	col := db.Collection(collection)
-	_, err := col.InsertOne(context.TODO(), doc)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (c *Client) Find(database string, collection string, filter map[string]string) bson.Raw {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
@@ -80,7 +70,7 @@ func (c *Client) Find(database string, collection string, filter map[string]stri
 	return nil
 }
 
-func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) bson.Raw {
+func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) int {
 	collection := c.client.Database(databaseName).Collection(collectionName)
 	opts := options.FindOne()
 	objId, err := primitive.ObjectIDFromHex(objectIdStr)
@@ -90,8 +80,6 @@ func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr
 	if err != nil {
     	log.Fatal(err)
 	}
-	
-	log.Printf("Response: %+v\n", bytes)
 
-	return bytes
+	return len(bytes)
 }
