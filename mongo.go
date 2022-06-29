@@ -80,7 +80,9 @@ func (c *Client) Find(database string, collection string, filter map[string]stri
 	return nil
 }
 
-func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) error {
+func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr string) bson.M {
+	log.Printf("Find with object id filter: %+v\n", objectIdStr)
+
 	collection := c.client.Database(databaseName).Collection(collectionName)
 	opts := options.FindOne()
 	objId, err := primitive.ObjectIDFromHex(objectIdStr)
@@ -94,5 +96,5 @@ func (c *Client) FindOne(databaseName string, collectionName string, objectIdStr
 	
 	log.Printf("Found the document: %+v\n", result)
 	
-	return nil
+	return result
 }
